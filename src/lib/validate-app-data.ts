@@ -1,15 +1,31 @@
-import { DEFAULT_SETTINGS } from "@/lib/constants";
-import type { AppData, Expense, PersonName, TripSettings } from "@/types";
+import { DEFAULT_SETTINGS, PEOPLE, SHARED_PAYER } from "@/lib/constants";
+import type {
+  AppData,
+  Expense,
+  ExpensePayer,
+  PersonName,
+  TripSettings,
+} from "@/types";
 
-const PEOPLE: PersonName[] = ["Anna", "Kostya", "Taya"];
-
-/** Старое имя в базе — показываем как Kostya */
 function normalizePerson(person: string): PersonName | null {
   if (person === "Husband") return "Kostya";
   return PEOPLE.includes(person as PersonName) ? (person as PersonName) : null;
 }
 
-/** Normalize and validate data from the database or API body */
+function normalizePayer(raw: string): ExpensePayer | null {
+  const p = raw.trim();
+  if (
+    p === SHARED_PAYER ||
+    p === "Общее" ||
+    p === "общее" ||
+    p === "Shared" ||
+    p === "shared"
+  ) {
+    return SHARED_PAYER;
+  }
+  return normalizePerson(p);
+}
+
 export function parseAppData(raw: unknown): AppData {
   const obj = (raw && typeof raw === "object" ? raw : {}) as Partial<AppData>;
 
@@ -30,7 +46,7 @@ export function parseAppData(raw: unknown): AppData {
 function normalizeExpense(e: unknown): Expense | null {
   if (!e || typeof e !== "object") return null;
   const x = e as Expense;
-  const person = normalizePerson(String(x.person));
+  const person = normalizePayer(String(x.person));
   if (
     !person ||
     typeof x.id !== "string" ||

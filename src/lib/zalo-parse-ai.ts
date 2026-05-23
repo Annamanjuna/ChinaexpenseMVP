@@ -1,5 +1,9 @@
 import type { ParsedZaloExpense } from "@/types/zalo";
-import { openaiChatCompletions, validateOpenAIKeyFormat } from "@/lib/openai-http";
+import {
+  getOpenAIKey,
+  openaiChatCompletions,
+  validateOpenAIKeyFormat,
+} from "@/lib/openai-http";
 import { parseZaloTextRegex } from "@/lib/zalo-parse-regex";
 import { parseExpensesFromAiJson, ZALO_AI_SYSTEM } from "@/lib/zalo-parse-shared";
 
@@ -8,7 +12,7 @@ const MODEL = "gpt-4o-mini";
 export async function parseZaloTextWithAI(
   text: string
 ): Promise<{ expenses: ParsedZaloExpense[]; warning?: string; error?: string }> {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = getOpenAIKey();
   const keyError = validateOpenAIKeyFormat(apiKey);
   if (keyError) {
     return {

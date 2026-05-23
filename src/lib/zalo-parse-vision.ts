@@ -1,5 +1,9 @@
 import type { ParsedZaloExpense } from "@/types/zalo";
-import { openaiChatCompletions, validateOpenAIKeyFormat } from "@/lib/openai-http";
+import {
+  getOpenAIKey,
+  openaiChatCompletions,
+  validateOpenAIKeyFormat,
+} from "@/lib/openai-http";
 import {
   dedupeExpenses,
   parseExpensesFromAiJson,
@@ -23,7 +27,7 @@ export type VisionParseResult = {
 export async function parseZaloImagesWithVision(
   images: ImageInput[]
 ): Promise<VisionParseResult> {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = getOpenAIKey();
   const keyError = validateOpenAIKeyFormat(apiKey);
   if (keyError) {
     return { expenses: [], error: keyError };

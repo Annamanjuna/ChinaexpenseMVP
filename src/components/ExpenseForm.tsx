@@ -1,17 +1,16 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { PEOPLE } from "@/lib/constants";
+import { EXPENSE_PAYERS } from "@/lib/constants";
 import { t } from "@/lib/strings";
-import type { PersonName } from "@/types";
+import type { ExpensePayer } from "@/types";
 
 interface ExpenseFormProps {
-  onAdd: (person: PersonName, amountCny: number, note?: string) => boolean;
+  onAdd: (payer: ExpensePayer, amountCny: number, note?: string) => boolean;
 }
 
-/** Quick-add form optimized for mobile: large inputs and one primary button */
 export function ExpenseForm({ onAdd }: ExpenseFormProps) {
-  const [person, setPerson] = useState<PersonName>("Anna");
+  const [person, setPerson] = useState<ExpensePayer>("Anna");
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
   const [error, setError] = useState("");
@@ -49,15 +48,18 @@ export function ExpenseForm({ onAdd }: ExpenseFormProps) {
           </span>
           <select
             value={person}
-            onChange={(e) => setPerson(e.target.value as PersonName)}
+            onChange={(e) => setPerson(e.target.value as ExpensePayer)}
             className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 font-medium text-slate-900"
           >
-            {PEOPLE.map((p) => (
-              <option key={p} value={p}>
-                {p}
+            {EXPENSE_PAYERS.map(({ value, label }) => (
+              <option key={value} value={value}>
+                {label}
               </option>
             ))}
           </select>
+          {person === "Shared" && (
+            <p className="mt-1 text-xs text-slate-500">{t.sharedFormHint}</p>
+          )}
         </label>
 
         <label className="block">

@@ -1,12 +1,11 @@
 import type { BudgetSummary, Expense, TripSettings } from "@/types";
+import { computeSplitSummary } from "@/lib/person-stats";
 import { getTodayDateString } from "@/lib/format";
 
-/** Convert CNY to VND using the configured rate */
 export function cnyToVnd(cny: number, rate: number): number {
   return cny * rate;
 }
 
-/** Sum expenses for a specific calendar day */
 export function sumExpensesForDate(
   expenses: Expense[],
   date: string
@@ -18,7 +17,6 @@ export function sumExpensesForDate(
   };
 }
 
-/** Sum all expenses within trip date range (inclusive) */
 export function sumTripExpenses(
   expenses: Expense[],
   settings: TripSettings
@@ -32,25 +30,29 @@ export function sumTripExpenses(
   };
 }
 
-/** Check if a date falls within the trip window */
 export function isDateInTrip(date: string, settings: TripSettings): boolean {
   return date >= settings.tripStart && date <= settings.tripEnd;
 }
 
-/**
- * Build the sticky summary card numbers.
- * Daily budget resets automatically each calendar day (we filter by today's date).
- */
 export function computeBudgetSummary(
   expenses: Expense[],
   settings: TripSettings,
   today: string = getTodayDateString()
 ): BudgetSummary {
+  const rate = settings.cnyToVndRate;
+  const todayExpenses = expenses.filter((e) => e.date === today);
+  const tripExpenses = expenses.filter(
+    (e) => e.date >= settings.tripStart && e.date <= settings.tripEnd
+  );
+
   const todayTotals = sumExpensesForDate(expenses, today);
   const tripTotals = sumTripExpenses(expenses, settings);
+  const todaySplit = computeSplitSummary(todayExpenses, rate);
+  const tripSplit = computeSplitSummary(tripExpenses, rate);
+
   const dailyBudgetCny = settings.dailyBudgetCny;
   const dailyRemainingCny = dailyBudgetCny - todayTotals.cny;
-  const dailyRemainingVnd = cnyToVnd(dailyRemainingCny, settings.cnyToVndRate);
+  const dailyRemainingVnd = cnyToVnd(dailyRemainingCny, rate);
   const isOverBudget = dailyRemainingCny < 0;
   const dailyProgressPercent =
     dailyBudgetCny > 0
@@ -66,10 +68,10 @@ export function computeBudgetSummary(
     dailyRemainingCny,
     dailyRemainingVnd,
     isOverBudget,
-    dailyProgressPercent: isOverBudget
-      ? 100
-      : dailyProgressPercent,
+    dailyProgressPercent: isOverBudget ? 100 : dailyProgressPercent,
     todayDate: today,
     isTripDay: isDateInTrip(today, settings),
+    todaySplit,
+    tripSplit,
   };
 }

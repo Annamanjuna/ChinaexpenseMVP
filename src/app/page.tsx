@@ -10,8 +10,15 @@ import { useTravelStore } from "@/hooks/useTravelStore";
 import { t } from "@/lib/strings";
 
 export default function HomePage() {
-  const { hydrated, expenses, summary, addExpense, removeExpense, loadMockData } =
-    useTravelStore();
+  const {
+    hydrated,
+    expenses,
+    summary,
+    settings,
+    addExpense,
+    removeExpense,
+    loadMockData,
+  } = useTravelStore();
 
   if (!hydrated || !summary) {
     return (
@@ -29,10 +36,17 @@ export default function HomePage() {
 
       <main className="mx-auto w-full max-w-lg flex-1 space-y-6 px-4 py-6">
         <ExpenseForm onAdd={addExpense} />
-        <SpendingChart expenses={expenses} />
-        <ExpenseList expenses={expenses} onRemove={removeExpense} />
+        <SpendingChart
+          expenses={expenses}
+          rate={settings?.cnyToVndRate ?? 4000}
+        />
+        <ExpenseList
+          expenses={expenses}
+          onRemove={removeExpense}
+          title={t.recentExpenses}
+        />
 
-        {expenses.length === 0 && (
+        {(expenses ?? []).length === 0 && (
           <button
             type="button"
             onClick={loadMockData}

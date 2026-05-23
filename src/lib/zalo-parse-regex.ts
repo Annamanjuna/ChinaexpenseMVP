@@ -1,5 +1,5 @@
-import { PEOPLE } from "@/lib/constants";
-import type { PersonName } from "@/types";
+import { PEOPLE, SHARED_PAYER } from "@/lib/constants";
+import type { ExpensePayer, PersonName } from "@/types";
 import type { ParsedZaloExpense } from "@/types/zalo";
 
 /** Подписи итога на китайских чеках (символ ¥ часто отсутствует) */
@@ -35,7 +35,7 @@ function parseLineByLine(text: string): ParsedZaloExpense[] {
     const amountCny = extractAmountFromLine(line);
     if (amountCny === null) continue;
 
-    const person = detectPerson(line) ?? detectPerson(text) ?? "Anna";
+    const person = detectPayer(line) ?? detectPayer(text) ?? "Anna";
     const note = cleanNote(line, amountCny);
 
     results.push({ person, amountCny, note: note || undefined });
@@ -51,7 +51,7 @@ function parseAsReceipt(text: string): ParsedZaloExpense[] {
   const total = extractReceiptTotal(text);
   if (total === null) return [];
 
-  const person = detectPerson(text) ?? "Anna";
+  const person = detectPayer(text) ?? "Anna";
   const note = extractMerchantNote(text) || "Чек";
 
   return [{ person, amountCny: total, note }];
@@ -165,8 +165,9 @@ function extractMerchantNote(text: string): string {
   return "";
 }
 
-function detectPerson(text: string): PersonName | null {
+function detectPayer(text: string): ExpensePayer | null {
   const lower = text.toLowerCase();
+  if (/\bобщее\b|общий|shared\b/i.test(lower)) return SHARED_PAYER;
   if (/\bhusband\b|костя|kostya/i.test(text)) return "Kostya";
   if (/\banna\b|анна/i.test(lower)) return "Anna";
   if (/\btaya\b|тая/i.test(lower)) return "Taya";
@@ -200,7 +201,7 @@ function dedupeParsed(items: ParsedZaloExpense[]): ParsedZaloExpense[] {
 export function isValidParsedList(items: ParsedZaloExpense[]): boolean {
   return items.every(
     (e) =>
-      PEOPLE.includes(e.person) &&
+      (PEOPLE.includes(e.person as PersonName) || e.person === SHARED_PAYER) &&
       typeof e.amountCny === "number" &&
       e.amountCny > 0
   );

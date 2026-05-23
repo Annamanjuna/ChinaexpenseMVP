@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { validateOpenAIKeyFormat } from "@/lib/openai-http";
+import { getOpenAIKey, validateOpenAIKeyFormat } from "@/lib/openai-http";
 import { parseZaloImagesWithVision } from "@/lib/zalo-parse-vision";
 import { zaloErrorResponse } from "@/lib/zalo-api-response";
 import type { ZaloParseResponse } from "@/types/zalo";
@@ -41,7 +41,7 @@ function resolveMime(file: File): { mime: string } | { error: string } {
 }
 
 export async function POST(request: NextRequest) {
-  const keyError = validateOpenAIKeyFormat(process.env.OPENAI_API_KEY);
+  const keyError = validateOpenAIKeyFormat(getOpenAIKey());
   if (keyError) {
     return zaloErrorResponse(keyError, 503, "vision");
   }
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
     error,
   };
 
-  if (error && expenses.length === 0) {
+  if (error && (expenses?.length ?? 0) === 0) {
     return NextResponse.json(response, { status: 422 });
   }
 

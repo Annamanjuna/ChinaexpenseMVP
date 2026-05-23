@@ -3,14 +3,14 @@
 import { useRef, useState, type ReactNode } from "react";
 import { ZaloExpensePreview } from "@/components/ZaloExpensePreview";
 import { t } from "@/lib/strings";
-import type { PersonName } from "@/types";
+import type { ExpensePayer } from "@/types";
 import type { ParsedZaloExpense, ZaloParseResponse } from "@/types/zalo";
 
 type Tab = "text" | "screenshot";
 
 interface ZaloImportFormProps {
   onAddBatch: (
-    items: { person: PersonName; amountCny: number; note?: string }[]
+    items: { person: ExpensePayer; amountCny: number; note?: string }[]
   ) => number;
 }
 
@@ -26,21 +26,21 @@ export function ZaloImportForm({ onAddBatch }: ZaloImportFormProps) {
   const [info, setInfo] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  function applyParseResult(
-    data: ZaloParseResponse & { error?: string },
-    httpOk: boolean
-  ) {
-    const expenses = Array.isArray(data.expenses) ? data.expenses : [];
+  function applyParseResult(data: unknown, httpOk: boolean) {
+    const body = (data && typeof data === "object" ? data : {}) as ZaloParseResponse & {
+      error?: string;
+    };
+    const expenses = Array.isArray(body.expenses) ? body.expenses : [];
 
-    if (data.error && expenses.length === 0) {
-      setError(data.error);
-      setInfo(data.warning ?? null);
+    if (body.error && expenses.length === 0) {
+      setError(body.error);
+      setInfo(body.warning ?? null);
       setParsed([]);
       return;
     }
 
-    if (!httpOk && data.error) {
-      setError(data.error);
+    if (!httpOk && body.error) {
+      setError(body.error);
       setInfo(null);
       setParsed([]);
       return;
@@ -52,12 +52,12 @@ export function ZaloImportForm({ onAddBatch }: ZaloImportFormProps) {
 
     const parts: string[] = [];
     if (expenses.length > 0) {
-      if (data.method === "vision") parts.push(t.zaloParsedVision);
-      else if (data.method === "ai") parts.push(t.zaloParsedAi);
+      if (body.method === "vision") parts.push(t.zaloParsedVision);
+      else if (body.method === "ai") parts.push(t.zaloParsedAi);
       else parts.push(t.zaloParsedSimple);
     }
-    if (data.warning) parts.push(data.warning);
-    if (expenses.length === 0 && !data.error) {
+    if (body.warning) parts.push(body.warning);
+    if (expenses.length === 0 && !body.error) {
       parts.push(t.zaloNothingFound);
     }
     setInfo(parts.length > 0 ? parts.join(" ") : null);
@@ -140,7 +140,7 @@ export function ZaloImportForm({ onAddBatch }: ZaloImportFormProps) {
   }
 
   function handleAddSelected() {
-    if (!parsed) return;
+    if (!parsed?.length) return;
     const items = parsed.filter((_, i) => selected.has(i));
     const count = onAddBatch(items);
     setInfo(t.zaloAddedCount.replace("{n}", String(count)));

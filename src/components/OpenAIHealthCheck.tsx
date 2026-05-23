@@ -13,10 +13,15 @@ export function OpenAIHealthCheck() {
     (async () => {
       try {
         const res = await fetch("/api/zalo/health");
-        const data = (await res.json()) as { ok: boolean; message: string };
+        const data = (await res.json()) as {
+          ok?: boolean;
+          message?: string;
+          hint?: string;
+        };
         if (cancelled) return;
-        setStatus(data.ok ? "ok" : "fail");
-        setMessage(data.message);
+        setStatus(data?.ok ? "ok" : "fail");
+        const parts = [data?.message, data?.hint].filter(Boolean);
+        setMessage(parts.join(" ") || t.zaloHealthNetworkError);
       } catch {
         if (!cancelled) {
           setStatus("fail");

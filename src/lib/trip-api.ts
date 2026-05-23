@@ -1,3 +1,4 @@
+import { ensureAppData } from "@/lib/ensure-app-data";
 import type { AppData } from "@/types";
 
 export type TripFetchResult = {
@@ -14,9 +15,9 @@ export async function fetchTripFromCloud(): Promise<TripFetchResult> {
       (err as { error?: string }).error ?? `Failed to load (${res.status})`
     );
   }
-  const data = (await res.json()) as AppData;
+  const raw = await res.json();
   const updatedAt = res.headers.get("x-trip-updated-at") ?? undefined;
-  return { data, updatedAt };
+  return { data: ensureAppData(raw), updatedAt };
 }
 
 /** Save shared trip data to the server */

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { computeBudgetSummary, cnyToVnd } from "@/lib/calculations";
-import { SYNC_POLL_MS } from "@/lib/constants";
+import { DEFAULT_SETTINGS, SYNC_POLL_MS } from "@/lib/constants";
 import { getTodayDateString } from "@/lib/format";
 import {
   getDefaultAppData,
@@ -10,13 +10,14 @@ import {
   loadAppData,
   saveAppData,
 } from "@/lib/storage";
+import { ensureAppData } from "@/lib/ensure-app-data";
 import { t } from "@/lib/strings";
 import { fetchTripFromCloud, saveTripToCloud } from "@/lib/trip-api";
 import type {
   AppData,
   BudgetSummary,
   Expense,
-  PersonName,
+  ExpensePayer,
   TripSettings,
 } from "@/types";
 
@@ -38,9 +39,9 @@ export function useTravelStore() {
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const skipNextSaveRef = useRef(false);
 
-  const applyRemoteData = useCallback((appData: AppData) => {
+  const applyRemoteData = useCallback((appData: unknown) => {
     skipNextSaveRef.current = true;
-    setData(appData);
+    setData(ensureAppData(appData));
     setSyncStatus("synced");
     setSyncError(null);
   }, []);
@@ -51,8 +52,8 @@ export function useTravelStore() {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       updatedAtRef.current =
         res.headers.get("x-trip-updated-at") ?? undefined;
-      const appData = (await res.json()) as AppData;
-      applyRemoteData(appData);
+      const raw = await res.json();
+      applyRemoteData(raw);
       return true;
     } catch {
       return false;
@@ -84,7 +85,10 @@ export function useTravelStore() {
           setSyncError(t.cloudNotConfigured);
         }
       } finally {
-        if (!cancelled) setHydrated(true);
+        if (!cancelled) {
+          setData((current) => current ?? loadAppData());
+          setHydrated(true);
+        }
       }
     }
 
@@ -164,13 +168,13 @@ export function useTravelStore() {
   }, []);
 
   const buildExpense = useCallback(
-    (person: PersonName, amountCny: number, note?: string): Expense | null => {
+    (payer: ExpensePayer, amountCny: number, note?: string): Expense | null => {
       if (!data || amountCny <= 0) return null;
-      const rate = data.settings.cnyToVndRate;
+      const rate = data.settings?.cnyToVndRate ?? DEFAULT_SETTINGS.cnyToVndRate;
       const today = getTodayDateString();
       return {
         id: crypto.randomUUID(),
-        person,
+        person: payer,
         amountCny,
         amountVnd: cnyToVnd(amountCny, rate),
         note: note?.trim() || undefined,
@@ -182,12 +186,12 @@ export function useTravelStore() {
   );
 
   const addExpense = useCallback(
-    (person: PersonName, amountCny: number, note?: string) => {
-      const expense = buildExpense(person, amountCny, note);
+    (payer: ExpensePayer, amountCny: number, note?: string) => {
+      const expense = buildExpense(payer, amountCny, note);
       if (!expense) return false;
       setData((prev) => {
         if (!prev) return prev;
-        return { ...prev, expenses: [expense, ...prev.expenses] };
+        return { ...prev, expenses: [expense, ...(prev.expenses ?? [])] };
       });
       return true;
     },
@@ -196,7 +200,7 @@ export function useTravelStore() {
 
   /** Импорт нескольких расходов из Zalo */
   const addExpenses = useCallback(
-    (items: { person: PersonName; amountCny: number; note?: string }[]) => {
+    (items: { person: ExpensePayer; amountCny: number; note?: string }[]) => {
       const newOnes: Expense[] = [];
       for (const item of items) {
         const e = buildExpense(item.person, item.amountCny, item.note);
@@ -205,7 +209,7 @@ export function useTravelStore() {
       if (newOnes.length === 0) return 0;
       setData((prev) => {
         if (!prev) return prev;
-        return { ...prev, expenses: [...newOnes, ...prev.expenses] };
+        return { ...prev, expenses: [...newOnes, ...(prev.expenses ?? [])] };
       });
       return newOnes.length;
     },
@@ -217,7 +221,7 @@ export function useTravelStore() {
       if (!prev) return prev;
       return {
         ...prev,
-        expenses: prev.expenses.filter((e) => e.id !== id),
+        expenses: (prev.expenses ?? []).filter((e) => e.id !== id),
       };
     });
   }, []);
@@ -228,7 +232,7 @@ export function useTravelStore() {
       const rate = base.settings.cnyToVndRate;
       return {
         ...base,
-        expenses: [...getMockExpenses(rate), ...base.expenses],
+        expenses: [...getMockExpenses(rate), ...(base.expenses ?? [])],
       };
     });
   }, []);
@@ -242,11 +246,11 @@ export function useTravelStore() {
 
   const summary: BudgetSummary | null =
     data && hydrated
-      ? computeBudgetSummary(data.expenses, data.settings)
+      ? computeBudgetSummary(data.expenses ?? [], data.settings)
       : null;
 
   const expensesSorted = data
-    ? [...data.expenses].sort(
+    ? [...(data.expenses ?? [])].sort(
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       )

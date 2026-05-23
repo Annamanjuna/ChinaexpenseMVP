@@ -1,10 +1,13 @@
-/** Person who paid for an expense */
+/** Участники поездки */
 export type PersonName = "Anna" | "Kostya" | "Taya";
+
+/** Кто указан в расходе: человек или общий (делится на 3) */
+export type ExpensePayer = PersonName | "Shared";
 
 /** A single expense entry */
 export interface Expense {
   id: string;
-  person: PersonName;
+  person: ExpensePayer;
   amountCny: number;
   amountVnd: number;
   note?: string;
@@ -16,16 +19,40 @@ export interface Expense {
 
 /** Trip and budget settings (editable in Settings) */
 export interface TripSettings {
-  tripStart: string; // YYYY-MM-DD
+  tripStart: string;
   tripEnd: string;
   dailyBudgetCny: number;
   cnyToVndRate: number;
 }
 
-/** Everything persisted in localStorage */
+/** Everything persisted in localStorage / Supabase */
 export interface AppData {
   expenses: Expense[];
   settings: TripSettings;
+}
+
+/** Сумма на одного человека (с учётом доли от «Общее») */
+export interface PersonAmount {
+  person: PersonName;
+  cny: number;
+  vnd: number;
+}
+
+/** Разбивка: общая сумма + доля каждого */
+export interface SplitSummary {
+  grossCny: number;
+  grossVnd: number;
+  sharedCny: number;
+  sharedVnd: number;
+  perPerson: PersonAmount[];
+}
+
+/** Одна строка в истории по дням */
+export interface DayHistoryRow {
+  date: string;
+  grossCny: number;
+  grossVnd: number;
+  perPerson: PersonAmount[];
 }
 
 /** Computed summary numbers shown on the main page */
@@ -38,8 +65,9 @@ export interface BudgetSummary {
   dailyRemainingCny: number;
   dailyRemainingVnd: number;
   isOverBudget: boolean;
-  /** 0–100, can exceed 100 when over budget */
   dailyProgressPercent: number;
   todayDate: string;
   isTripDay: boolean;
+  todaySplit: SplitSummary;
+  tripSplit: SplitSummary;
 }

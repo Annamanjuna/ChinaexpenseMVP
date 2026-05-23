@@ -1,8 +1,8 @@
-import type { PersonName } from "@/types";
+import type { ExpensePayer } from "@/types";
 
 /** Одна строка, которую ИИ или парсер извлёк из чата Zalo */
 export interface ParsedZaloExpense {
-  person: PersonName;
+  person: ExpensePayer;
   amountCny: number;
   note?: string;
 }

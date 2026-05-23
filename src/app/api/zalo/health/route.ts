@@ -1,15 +1,21 @@
 import { NextResponse } from "next/server";
-import { openaiChatCompletions, validateOpenAIKeyFormat } from "@/lib/openai-http";
+import {
+  getOpenAIKey,
+  openaiChatCompletions,
+  openAIKeyHint,
+  validateOpenAIKeyFormat,
+} from "@/lib/openai-http";
 
-/** GET — проверка, настроен ли ключ OpenAI (для диагностики на странице Zalo) */
+/** GET — проверка OPENAI_API_KEY на сервере Vercel */
 export async function GET() {
-  const key = process.env.OPENAI_API_KEY;
+  const key = getOpenAIKey();
   const formatError = validateOpenAIKeyFormat(key);
 
   if (formatError) {
     return NextResponse.json({
       ok: false,
       message: formatError,
+      hint: key ? `Сейчас в переменной: ${openAIKeyHint(key)}` : undefined,
     });
   }
 
@@ -23,11 +29,12 @@ export async function GET() {
     return NextResponse.json({
       ok: false,
       message: test.message,
+      hint: `Ключ загружен (${openAIKeyHint(key)}), но запрос к OpenAI не прошёл.`,
     });
   }
 
   return NextResponse.json({
     ok: true,
-    message: "OpenAI подключён. Скриншоты и умный разбор текста работают.",
+    message: "OpenAI подключён. Скриншоты и умный разбор работают.",
   });
 }

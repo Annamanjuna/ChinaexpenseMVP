@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       warning,
       error,
     };
-    if (error && expenses.length === 0) {
+    if (error && (expenses?.length ?? 0) === 0) {
       return NextResponse.json(response, { status: 422 });
     }
     return NextResponse.json(response);
