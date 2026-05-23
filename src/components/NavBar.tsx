@@ -4,10 +4,11 @@ import { t } from "@/lib/strings";
 interface NavBarProps {
   title: string;
   backHref?: string;
+  /** Главная: ссылки Zalo + Настройки */
+  showHomeActions?: boolean;
 }
 
-/** Simple top navigation with optional back link */
-export function NavBar({ title, backHref }: NavBarProps) {
+export function NavBar({ title, backHref, showHomeActions }: NavBarProps) {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
       <div className="mx-auto flex max-w-lg items-center justify-between px-4 py-3">
@@ -27,13 +28,30 @@ export function NavBar({ title, backHref }: NavBarProps) {
             {title}
           </h1>
         </div>
-        {!backHref && (
+        {showHomeActions ? (
+          <div className="flex shrink-0 items-center gap-1">
+            <Link
+              href="/zalo"
+              className="flex h-10 items-center rounded-full px-3 text-sm font-medium text-brand-600 hover:bg-brand-50"
+            >
+              Zalo
+            </Link>
+            <Link
+              href="/settings"
+              className="flex h-10 items-center rounded-full px-3 text-sm font-medium text-slate-600 hover:bg-slate-100"
+            >
+              {t.settings}
+            </Link>
+          </div>
+        ) : !backHref ? (
           <Link
             href="/settings"
             className="flex h-10 items-center rounded-full px-3 text-sm font-medium text-brand-600 hover:bg-brand-50"
           >
             {t.settings}
           </Link>
+        ) : (
+          <span className="w-10" />
         )}
       </div>
     </header>

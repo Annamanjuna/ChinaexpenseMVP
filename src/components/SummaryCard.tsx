@@ -14,7 +14,7 @@ interface SummaryCardProps {
 export function SummaryCard({ summary }: SummaryCardProps) {
   return (
     <section
-      className={`sticky top-[88px] z-30 border-b px-4 py-4 shadow-sm ${
+      className={`sticky top-[57px] z-30 border-b px-4 py-4 shadow-sm ${
         summary.isOverBudget
           ? "border-danger-500/30 bg-danger-50"
           : "border-slate-200 bg-white"

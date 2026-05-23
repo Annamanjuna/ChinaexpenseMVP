@@ -163,13 +163,12 @@ export function useTravelStore() {
     });
   }, []);
 
-  const addExpense = useCallback(
-    (person: PersonName, amountCny: number, note?: string) => {
-      if (!data || amountCny <= 0) return false;
-
+  const buildExpense = useCallback(
+    (person: PersonName, amountCny: number, note?: string): Expense | null => {
+      if (!data || amountCny <= 0) return null;
       const rate = data.settings.cnyToVndRate;
       const today = getTodayDateString();
-      const expense: Expense = {
+      return {
         id: crypto.randomUUID(),
         person,
         amountCny,
@@ -178,17 +177,39 @@ export function useTravelStore() {
         date: today,
         createdAt: new Date().toISOString(),
       };
+    },
+    [data]
+  );
 
+  const addExpense = useCallback(
+    (person: PersonName, amountCny: number, note?: string) => {
+      const expense = buildExpense(person, amountCny, note);
+      if (!expense) return false;
       setData((prev) => {
         if (!prev) return prev;
-        return {
-          ...prev,
-          expenses: [expense, ...prev.expenses],
-        };
+        return { ...prev, expenses: [expense, ...prev.expenses] };
       });
       return true;
     },
-    [data]
+    [buildExpense]
+  );
+
+  /** Импорт нескольких расходов из Zalo */
+  const addExpenses = useCallback(
+    (items: { person: PersonName; amountCny: number; note?: string }[]) => {
+      const newOnes: Expense[] = [];
+      for (const item of items) {
+        const e = buildExpense(item.person, item.amountCny, item.note);
+        if (e) newOnes.push(e);
+      }
+      if (newOnes.length === 0) return 0;
+      setData((prev) => {
+        if (!prev) return prev;
+        return { ...prev, expenses: [...newOnes, ...prev.expenses] };
+      });
+      return newOnes.length;
+    },
+    [buildExpense]
   );
 
   const removeExpense = useCallback((id: string) => {
@@ -240,6 +261,7 @@ export function useTravelStore() {
     syncError,
     useLocalFallback,
     addExpense,
+    addExpenses,
     removeExpense,
     updateSettings,
     loadMockData,

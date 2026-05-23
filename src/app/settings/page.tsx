@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { NavBar } from "@/components/NavBar";
 import { SettingsForm } from "@/components/SettingsForm";
@@ -44,7 +45,12 @@ export default function SettingsPage() {
           </button>
         </section>
 
-        <p className="text-center text-xs text-slate-400">{t.step2}</p>
+        <Link
+          href="/zalo"
+          className="block text-center text-sm font-medium text-brand-600"
+        >
+          {t.zaloLink} →
+        </Link>
       </main>
     </div>
   );
