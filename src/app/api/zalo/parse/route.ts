@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parseZaloTextWithAI } from "@/lib/zalo-parse-ai";
 import { parseZaloTextRegex } from "@/lib/zalo-parse-regex";
+import { zaloErrorResponse } from "@/lib/zalo-api-response";
 import type { ZaloParseResponse } from "@/types/zalo";
 
 /**
@@ -12,21 +13,19 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Неверный JSON" }, { status: 400 });
+    return zaloErrorResponse("Неверный JSON", 400, "regex");
   }
 
   const text = body.text?.trim();
   if (!text || text.length < 3) {
-    return NextResponse.json(
-      { error: "Вставьте текст из чата Zalo" },
-      { status: 400 }
-    );
+    return zaloErrorResponse("Вставьте текст из чата Zalo", 400, "regex");
   }
 
   if (text.length > 20000) {
-    return NextResponse.json(
-      { error: "Слишком длинный текст (макс. 20000 символов)" },
-      { status: 400 }
+    return zaloErrorResponse(
+      "Слишком длинный текст (макс. 20000 символов)",
+      400,
+      "regex"
     );
   }
 
@@ -35,7 +34,7 @@ export async function POST(request: NextRequest) {
   if (hasOpenAI) {
     const { expenses, warning, error } = await parseZaloTextWithAI(text);
     const response: ZaloParseResponse = {
-      expenses,
+      expenses: expenses ?? [],
       method: "ai",
       warning,
       error,

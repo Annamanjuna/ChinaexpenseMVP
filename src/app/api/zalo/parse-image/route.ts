@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateOpenAIKeyFormat } from "@/lib/openai-http";
 import { parseZaloImagesWithVision } from "@/lib/zalo-parse-vision";
+import { zaloErrorResponse } from "@/lib/zalo-api-response";
 import type { ZaloParseResponse } from "@/types/zalo";
 
 export const runtime = "nodejs";
@@ -42,14 +43,14 @@ function resolveMime(file: File): { mime: string } | { error: string } {
 export async function POST(request: NextRequest) {
   const keyError = validateOpenAIKeyFormat(process.env.OPENAI_API_KEY);
   if (keyError) {
-    return NextResponse.json({ error: keyError }, { status: 503 });
+    return zaloErrorResponse(keyError, 503, "vision");
   }
 
   let formData: FormData;
   try {
     formData = await request.formData();
   } catch {
-    return NextResponse.json({ error: "Неверный запрос" }, { status: 400 });
+    return zaloErrorResponse("Неверный запрос", 400, "vision");
   }
 
   const files = formData
@@ -57,16 +58,18 @@ export async function POST(request: NextRequest) {
     .filter((f): f is File => f instanceof File);
 
   if (files.length === 0) {
-    return NextResponse.json(
-      { error: "Выберите хотя бы один скриншот (JPG или PNG)." },
-      { status: 400 }
+    return zaloErrorResponse(
+      "Выберите хотя бы один скриншот (JPG или PNG).",
+      400,
+      "vision"
     );
   }
 
   if (files.length > MAX_FILES) {
-    return NextResponse.json(
-      { error: `Максимум ${MAX_FILES} скриншотов за раз.` },
-      { status: 400 }
+    return zaloErrorResponse(
+      `Максимум ${MAX_FILES} скриншотов за раз.`,
+      400,
+      "vision"
     );
   }
 
@@ -75,12 +78,13 @@ export async function POST(request: NextRequest) {
   for (const file of files) {
     const resolved = resolveMime(file);
     if ("error" in resolved) {
-      return NextResponse.json({ error: resolved.error }, { status: 400 });
+      return zaloErrorResponse(resolved.error, 400, "vision");
     }
     if (file.size > MAX_FILE_BYTES) {
-      return NextResponse.json(
-        { error: `Файл слишком большой: ${file.name} (макс. 4 МБ).` },
-        { status: 400 }
+      return zaloErrorResponse(
+        `Файл слишком большой: ${file.name} (макс. 4 МБ).`,
+        400,
+        "vision"
       );
     }
     const buffer = Buffer.from(await file.arrayBuffer());
@@ -93,7 +97,7 @@ export async function POST(request: NextRequest) {
   const { expenses, warning, error } = await parseZaloImagesWithVision(images);
 
   const response: ZaloParseResponse & { error?: string } = {
-    expenses,
+    expenses: expenses ?? [],
     method: "vision",
     warning,
     error,

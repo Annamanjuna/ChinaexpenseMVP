@@ -71,7 +71,7 @@ export function useTravelStore() {
         applyRemoteData(remote);
 
         const local = loadAppData();
-        if (local.expenses.length > 0 && remote.expenses.length === 0) {
+        if (local.expenses.length > 0 && (remote.expenses?.length ?? 0) === 0) {
           setData(local);
           setSyncStatus("saving");
         }

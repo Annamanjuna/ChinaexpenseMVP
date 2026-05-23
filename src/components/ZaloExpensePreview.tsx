@@ -17,7 +17,7 @@ export function ZaloExpensePreview({
   onToggle,
   onAdd,
 }: ZaloExpensePreviewProps) {
-  if (parsed.length === 0) return null;
+  if (!parsed?.length) return null;
 
   return (
     <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
