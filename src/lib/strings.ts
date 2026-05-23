@@ -36,9 +36,9 @@ export const t = {
   zaloScreenshotStep1: "Откройте чат поездки в Zalo.",
   zaloScreenshotStep2:
     "Сделайте скриншот (кнопки питания + громкость на iPhone, или жест на Android).",
-  zaloScreenshotStep3: "Загрузите фото ниже → «Разобрать скриншот».",
+  zaloScreenshotStep3: "Загрузите фото чека или чата → «Разобрать скриншот».",
   zaloScreenshotHint:
-    "Нужен OPENAI_API_KEY в Vercel. Форматы: JPG, PNG, WebP, до 4 МБ, до 5 фото за раз. HEIC с iPhone: «Настройки → Камера → Форматы → Наиболее совместимые».",
+    "На чеках часто нет знака ¥ — подойдёт строка 合计 / 总计 / 实付 или итоговая сумма. Нужен OPENAI_API_KEY в Vercel. JPG, PNG, WebP, до 4 МБ.",
   zaloPickImages: "📷 Выбрать скриншот(ы)",
   zaloFilesSelected: "Выбрано файлов: {n}",
   zaloParseScreenshot: "Разобрать скриншот",
@@ -57,7 +57,7 @@ export const t = {
   zaloParsedAi: "Разобрано с помощью ИИ.",
   zaloParsedSimple: "Разобрано простым парсером.",
   zaloNothingFound:
-    "Расходы не найдены — на скрине или в тексте должны быть суммы в юанях (¥, yuan, 元).",
+    "Сумма не найдена. Для чека: сфотографируйте итог (合计, 总计, 实付) или всю квитанцию. Для чата: укажите число и кто платил.",
   zaloPreview: "Найденные расходы",
   zaloAddSelected: "Добавить выбранные ({n})",
   zaloAddedCount: "Добавлено расходов: {n}",

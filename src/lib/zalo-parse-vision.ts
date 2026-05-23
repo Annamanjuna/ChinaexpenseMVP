@@ -58,7 +58,10 @@ export async function parseZaloImagesWithVision(
             content: [
               {
                 type: "text",
-                text: `This is screenshot ${i + 1} of ${slice.length} from a Zalo group chat about trip expenses in China. Read all visible messages. Extract every expense in CNY.`,
+                text: `Screenshot ${i + 1} of ${slice.length}. May be: Zalo chat, Chinese receipt (收据), Alipay/WeChat payment screen, or invoice.
+Trip is in China — amounts are CNY unless clearly VND or USD.
+Receipts often have NO ¥ symbol: use 合计/总计/实付/金额 or the final total number.
+One receipt = one expense. Chat = one expense per message with an amount.`,
               },
               {
                 type: "image_url",
@@ -98,7 +101,7 @@ export async function parseZaloImagesWithVision(
       expenses: [],
       warning:
         lastWarning ??
-        "На скриншотах не найдено расходов в юанях. Сделайте чёткий скрин с текстом сообщений.",
+        "Не удалось найти сумму. Сфотографируйте чётко строку с итогом (合计 / 总计 / 实付) или весь чек.",
     };
   }
 

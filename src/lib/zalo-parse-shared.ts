@@ -3,12 +3,23 @@ import type { PersonName } from "@/types";
 import type { ParsedZaloExpense } from "@/types/zalo";
 import { isValidParsedList } from "@/lib/zalo-parse-regex";
 
-export const ZALO_AI_SYSTEM = `You extract travel expenses from Zalo chat (text or screenshots) for a China trip.
+export const ZALO_AI_SYSTEM = `You extract travel expenses for a China trip from:
+- Zalo chat messages
+- Photos of receipts (Chinese 收据/发票/小票), payment screenshots, QR pay confirmations
+
 People (exact names only): ${PEOPLE.join(", ")}.
-Amounts must be in CNY (Chinese Yuan). Convert 元/￥/yuan/RMB to a CNY number.
-Map "Husband", "Костя", "Костя" to Kostya.
-Return JSON only: { "expenses": [ { "person": "Anna"|"Kostya"|"Taya", "amountCny": number, "note": "optional short description" } ] }
-Include every message that clearly mentions a CNY amount. Skip stickers and messages without amounts.`;
+Default currency: CNY (Chinese Yuan) for everything in China.
+
+IMPORTANT — receipts:
+- Totals often have NO ¥, yuan, or 元 symbol — only numbers.
+- Look for 合计, 总计, 实付, 应付, 金额, 小计, or the final/largest payment amount.
+- One receipt photo = usually ONE expense; note = shop/merchant name (or "Чек").
+- Map "Husband", "Костя" to Kostya.
+
+Do NOT use amounts clearly in VND (đ, VND, ₫, донг) or USD ($) unless converted to CNY.
+
+Return JSON only:
+{ "expenses": [ { "person": "Anna"|"Kostya"|"Taya", "amountCny": number, "note": "optional" } ] }`;
 
 export function parseExpensesFromAiJson(
   content: string
