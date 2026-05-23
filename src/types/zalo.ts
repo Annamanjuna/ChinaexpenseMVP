@@ -12,4 +12,6 @@ export interface ZaloParseResponse {
   /** ai = текст OpenAI, vision = скриншот, regex = простой разбор */
   method: "ai" | "regex" | "vision";
   warning?: string;
+  /** Главная ошибка (показываем красным, не «сумма не найдена») */
+  error?: string;
 }

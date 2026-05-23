@@ -1,82 +1,67 @@
 import type { ParsedZaloExpense } from "@/types/zalo";
+import { openaiChatCompletions, validateOpenAIKeyFormat } from "@/lib/openai-http";
 import { parseZaloTextRegex } from "@/lib/zalo-parse-regex";
-import {
-  parseExpensesFromAiJson,
-  validateExpenses,
-  ZALO_AI_SYSTEM,
-} from "@/lib/zalo-parse-shared";
+import { parseExpensesFromAiJson, ZALO_AI_SYSTEM } from "@/lib/zalo-parse-shared";
 
 const MODEL = "gpt-4o-mini";
 
 export async function parseZaloTextWithAI(
   text: string
-): Promise<{ expenses: ParsedZaloExpense[]; warning?: string }> {
+): Promise<{ expenses: ParsedZaloExpense[]; warning?: string; error?: string }> {
   const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
+  const keyError = validateOpenAIKeyFormat(apiKey);
+  if (keyError) {
     return {
       expenses: parseZaloTextRegex(text),
-      warning: "OPENAI_API_KEY не задан — использован простой разбор.",
+      warning: keyError,
     };
   }
 
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      temperature: 0.1,
-      response_format: { type: "json_object" },
-      messages: [
-        { role: "system", content: ZALO_AI_SYSTEM },
-        {
-          role: "user",
-          content: `Chat messages:\n\n${text.slice(0, 12000)}`,
-        },
-      ],
-    }),
+  const result = await openaiChatCompletions(apiKey!, {
+    model: MODEL,
+    temperature: 0.1,
+    response_format: { type: "json_object" },
+    messages: [
+      { role: "system", content: ZALO_AI_SYSTEM },
+      { role: "user", content: `Chat or receipt text:\n\n${text.slice(0, 12000)}` },
+    ],
   });
 
-  if (!res.ok) {
-    console.error("OpenAI text error:", await res.text());
+  if (!result.ok) {
     return {
       expenses: parseZaloTextRegex(text),
-      warning: "Ошибка ИИ — использован простой разбор.",
+      error: result.message,
+      warning: "Использован простой разбор из‑за ошибки OpenAI.",
     };
   }
 
-  const json = (await res.json()) as {
-    choices?: { message?: { content?: string } }[];
-  };
-  const content = json.choices?.[0]?.message?.content;
+  const content = result.data.choices?.[0]?.message?.content;
   if (!content) {
     return {
       expenses: parseZaloTextRegex(text),
-      warning: "Пустой ответ ИИ — простой разбор.",
+      error: "Пустой ответ OpenAI.",
+      warning: "Использован простой разбор.",
     };
   }
 
   try {
     const expenses = parseExpensesFromAiJson(content);
-    if (expenses.length === 0) {
-      return {
-        expenses: parseZaloTextRegex(text),
-        warning: "ИИ не нашёл расходов — простой разбор.",
-      };
+    if (expenses.length > 0) {
+      return { expenses };
     }
-    if (!validateExpenses(expenses)) {
-      return {
-        expenses: parseZaloTextRegex(text),
-        warning: "Некорректный ответ ИИ.",
-      };
-    }
-    return { expenses };
+    const fallback = parseZaloTextRegex(text);
+    return {
+      expenses: fallback,
+      warning:
+        fallback.length === 0
+          ? "ИИ не нашёл сумм. Для чека вставьте текст с 合计/总计 или числом."
+          : "ИИ не нашёл сумм — использован простой разбор.",
+    };
   } catch {
     return {
       expenses: parseZaloTextRegex(text),
-      warning: "Не удалось прочитать JSON от ИИ.",
+      error: "Не удалось прочитать JSON от OpenAI.",
+      warning: "Использован простой разбор.",
     };
   }
 }

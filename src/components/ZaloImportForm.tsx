@@ -26,16 +26,39 @@ export function ZaloImportForm({ onAddBatch }: ZaloImportFormProps) {
   const [info, setInfo] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  function applyParseResult(data: ZaloParseResponse & { error?: string }) {
+  function applyParseResult(
+    data: ZaloParseResponse & { error?: string },
+    httpOk: boolean
+  ) {
+    if (data.error && data.expenses.length === 0) {
+      setError(data.error);
+      setInfo(data.warning ?? null);
+      setParsed([]);
+      return;
+    }
+
+    if (!httpOk && data.error) {
+      setError(data.error);
+      setInfo(null);
+      setParsed([]);
+      return;
+    }
+
+    setError(null);
     setParsed(data.expenses);
     setSelected(new Set(data.expenses.map((_, i) => i)));
+
     const parts: string[] = [];
-    if (data.method === "vision") parts.push(t.zaloParsedVision);
-    else if (data.method === "ai") parts.push(t.zaloParsedAi);
-    else parts.push(t.zaloParsedSimple);
+    if (data.expenses.length > 0) {
+      if (data.method === "vision") parts.push(t.zaloParsedVision);
+      else if (data.method === "ai") parts.push(t.zaloParsedAi);
+      else parts.push(t.zaloParsedSimple);
+    }
     if (data.warning) parts.push(data.warning);
-    if (data.expenses.length === 0) parts.push(t.zaloNothingFound);
-    setInfo(parts.join(" "));
+    if (data.expenses.length === 0 && !data.error) {
+      parts.push(t.zaloNothingFound);
+    }
+    setInfo(parts.length > 0 ? parts.join(" ") : null);
   }
 
   async function handleParseText() {
@@ -50,8 +73,10 @@ export function ZaloImportForm({ onAddBatch }: ZaloImportFormProps) {
         body: JSON.stringify({ text }),
       });
       const data = (await res.json()) as ZaloParseResponse & { error?: string };
-      if (!res.ok) throw new Error(data.error ?? t.zaloParseError);
-      applyParseResult(data);
+      applyParseResult(data, res.ok);
+      if (!res.ok && !data.expenses?.length) {
+        throw new Error(data.error ?? t.zaloParseError);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : t.zaloParseError);
     } finally {
@@ -72,8 +97,10 @@ export function ZaloImportForm({ onAddBatch }: ZaloImportFormProps) {
         body: formData,
       });
       const data = (await res.json()) as ZaloParseResponse & { error?: string };
-      if (!res.ok) throw new Error(data.error ?? t.zaloParseError);
-      applyParseResult(data);
+      applyParseResult(data, res.ok);
+      if (!res.ok && !data.expenses?.length) {
+        throw new Error(data.error ?? t.zaloParseError);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : t.zaloParseError);
     } finally {

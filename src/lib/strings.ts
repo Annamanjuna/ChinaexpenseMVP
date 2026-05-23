@@ -61,6 +61,12 @@ export const t = {
   zaloPreview: "Найденные расходы",
   zaloAddSelected: "Добавить выбранные ({n})",
   zaloAddedCount: "Добавлено расходов: {n}",
+  zaloHealthChecking: "Проверка OpenAI…",
+  zaloHealthOkTitle: "✓ OpenAI подключён",
+  zaloHealthFailTitle: "⚠ OpenAI не работает",
+  zaloHealthHint:
+    "Vercel → Settings → Environment Variables → OPENAI_API_KEY = ключ с platform.openai.com (начинается с sk-). Не путайте с Supabase (sb_...). После изменения — Redeploy.",
+  zaloHealthNetworkError: "Не удалось проверить OpenAI (сеть).",
   settingsTripStart: "Дата начала поездки",
   settingsTripEnd: "Дата окончания поездки",
   settingsDailyBudget: "Дневной бюджет (CNY — на всех 3)",

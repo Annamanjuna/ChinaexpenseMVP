@@ -34,17 +34,22 @@ export function parseExpensesFromAiJson(
 
 export function normalizeAiItem(e: {
   person?: string;
-  amountCny?: number;
+  amountCny?: number | string;
   note?: string;
 }): ParsedZaloExpense | null {
   let person = e.person;
   if (person === "Husband") person = "Kostya";
-  if (!person || !PEOPLE.includes(person as PersonName)) return null;
-  const amountCny = Number(e.amountCny);
-  if (!amountCny || amountCny <= 0) return null;
+  if (!person || !PEOPLE.includes(person as PersonName)) {
+    person = "Anna";
+  }
+  const amountCny =
+    typeof e.amountCny === "string"
+      ? parseFloat(e.amountCny.replace(",", "."))
+      : Number(e.amountCny);
+  if (!amountCny || amountCny <= 0 || Number.isNaN(amountCny)) return null;
   return {
     person: person as PersonName,
-    amountCny,
+    amountCny: Math.round(amountCny * 100) / 100,
     note: e.note?.trim() || undefined,
   };
 }

@@ -33,12 +33,16 @@ export async function POST(request: NextRequest) {
   const hasOpenAI = Boolean(process.env.OPENAI_API_KEY);
 
   if (hasOpenAI) {
-    const { expenses, warning } = await parseZaloTextWithAI(text);
+    const { expenses, warning, error } = await parseZaloTextWithAI(text);
     const response: ZaloParseResponse = {
       expenses,
       method: "ai",
       warning,
+      error,
     };
+    if (error && expenses.length === 0) {
+      return NextResponse.json(response, { status: 422 });
+    }
     return NextResponse.json(response);
   }
 
