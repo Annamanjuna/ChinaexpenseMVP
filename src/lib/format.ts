@@ -13,7 +13,7 @@ export function formatVnd(amount: number): string {
 
 /** Short time for expense list, e.g. "14:32" */
 export function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString("vi-VN", {
+  return new Date(iso).toLocaleTimeString("ru-RU", {
     hour: "2-digit",
     minute: "2-digit",
   });
@@ -23,8 +23,8 @@ export function formatTime(iso: string): string {
 export function formatDateLabel(dateStr: string): string {
   const d = new Date(dateStr + "T12:00:00");
   const today = getTodayDateString();
-  if (dateStr === today) return "Hôm nay";
-  return d.toLocaleDateString("vi-VN", {
+  if (dateStr === today) return "Сегодня";
+  return d.toLocaleDateString("ru-RU", {
     weekday: "short",
     day: "numeric",
     month: "short",

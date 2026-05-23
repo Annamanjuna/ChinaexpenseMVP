@@ -1,5 +1,5 @@
 /** Person who paid for an expense */
-export type PersonName = "Anna" | "Husband" | "Taya";
+export type PersonName = "Anna" | "Kostya" | "Taya";
 
 /** A single expense entry */
 export interface Expense {

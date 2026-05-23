@@ -3,6 +3,7 @@
 import type { Expense } from "@/types";
 import { PEOPLE } from "@/lib/constants";
 import { formatCny, getTodayDateString } from "@/lib/format";
+import { t } from "@/lib/strings";
 
 interface SpendingChartProps {
   expenses: Expense[];
@@ -31,7 +32,7 @@ export function SpendingChart({ expenses }: SpendingChartProps) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
       <h2 className="mb-3 text-sm font-semibold text-slate-700">
-        Chi tiêu hôm nay theo người
+        {t.spendingByPerson}
       </h2>
       <ul className="space-y-3">
         {totals.map(({ person, amount }) => (

@@ -1,7 +1,7 @@
 import type { PersonName, TripSettings } from "@/types";
 
 /** The three travelers on this trip */
-export const PEOPLE: PersonName[] = ["Anna", "Husband", "Taya"];
+export const PEOPLE: PersonName[] = ["Anna", "Kostya", "Taya"];
 
 /** localStorage key — fallback when cloud is unavailable (dev/offline) */
 export const STORAGE_KEY = "travel-expense-china-2026";

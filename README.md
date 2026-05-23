@@ -1,6 +1,6 @@
 # China Trip Expense Tracker (MVP)
 
-A lightweight, mobile-friendly web app to track shared travel expenses for 3 people (Anna, Husband, Taya) during a China trip. Amounts are entered in **CNY** and shown converted to **VND**.
+A lightweight, mobile-friendly web app to track shared travel expenses for 3 people (Anna, Kostya, Taya) during a China trip. Amounts are entered in **CNY** and shown converted to **VND**.
 
 **Deployed:** everyone uses the same link and sees the same data (Supabase cloud).  
 **Local dev:** works without cloud using browser storage as fallback.
@@ -29,7 +29,7 @@ Quick summary:
 
 1. Run `supabase/schema.sql` in Supabase SQL Editor  
 2. Deploy to Vercel with `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`  
-3. Share the `*.vercel.app` URL with Anna, Husband, and Taya  
+3. Share the `*.vercel.app` URL with Anna, Kostya, and Taya  
 
 ## Run locally
 
@@ -71,7 +71,7 @@ supabase/schema.sql         # One-time DB setup
 | Trip dates     | May 25–31, 2026 |
 | Daily budget   | 660 CNY (all 3) |
 | Exchange rate  | 1 CNY = 4000 VND |
-| People         | Anna, Husband, Taya |
+| People         | Anna, Kostya, Taya |
 
 ## How sync works
 

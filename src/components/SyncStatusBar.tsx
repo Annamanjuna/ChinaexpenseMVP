@@ -1,4 +1,5 @@
 import type { SyncStatus } from "@/hooks/useTravelStore";
+import { t } from "@/lib/strings";
 
 interface SyncStatusBarProps {
   status: SyncStatus;
@@ -6,7 +7,7 @@ interface SyncStatusBarProps {
   isLocalFallback: boolean;
 }
 
-/** Small indicator: cloud sync state for the shared trip */
+/** Индикатор синхронизации с облаком */
 export function SyncStatusBar({
   status,
   error,
@@ -47,18 +48,18 @@ export function SyncStatusBar({
 }
 
 function getLabel(status: SyncStatus, isLocalFallback: boolean): string {
-  if (isLocalFallback) return "Chỉ lưu trên máy này — cần deploy + Supabase để chia sẻ";
+  if (isLocalFallback) return t.syncLocalOnly;
   switch (status) {
     case "loading":
-      return "Đang tải dữ liệu chung…";
+      return t.syncLoading;
     case "saving":
-      return "Đang lưu…";
+      return t.syncSaving;
     case "synced":
-      return "Đồng bộ cloud — mọi người thấy cùng dữ liệu";
+      return t.syncOk;
     case "error":
-      return "Lỗi đồng bộ";
+      return t.syncError;
     case "offline":
-      return "Ngoại tuyến / chưa cấu hình cloud";
+      return t.syncOffline;
     default:
       return "";
   }

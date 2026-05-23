@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { t } from "@/lib/strings";
 
 interface NavBarProps {
   title: string;
@@ -15,7 +16,7 @@ export function NavBar({ title, backHref }: NavBarProps) {
             <Link
               href={backHref}
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-slate-600 hover:bg-slate-100"
-              aria-label="Quay lại"
+              aria-label={t.back}
             >
               ←
             </Link>
@@ -31,7 +32,7 @@ export function NavBar({ title, backHref }: NavBarProps) {
             href="/settings"
             className="flex h-10 items-center rounded-full px-3 text-sm font-medium text-brand-600 hover:bg-brand-50"
           >
-            Cài đặt
+            {t.settings}
           </Link>
         )}
       </div>

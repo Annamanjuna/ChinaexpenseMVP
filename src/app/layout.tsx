@@ -2,13 +2,13 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "China Trip Expenses",
+  title: "Расходы: поездка в Китай",
   description:
-    "Shared travel expense tracker for Anna, Husband & Taya — CNY to VND",
+    "Общий учёт расходов для Anna, Kostya и Taya — CNY в VND",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Trip Expenses",
+    title: "Расходы: Китай",
   },
 };
 
@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi">
+    <html lang="ru">
       <body className="min-h-screen antialiased safe-bottom">
         {children}
       </body>

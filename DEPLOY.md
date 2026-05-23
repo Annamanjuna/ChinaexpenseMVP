@@ -1,6 +1,6 @@
 # Deploy online (shared for everyone on the trip)
 
-Deploy to **Vercel** (free) + **Supabase** (free) so Anna, Husband, and Taya open the **same URL** and see the **same expenses**.
+Deploy to **Vercel** (free) + **Supabase** (free) so Anna, Kostya, and Taya open the **same URL** and see the **same expenses**.
 
 ## 1. Supabase (shared database)
 

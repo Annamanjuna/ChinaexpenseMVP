@@ -8,6 +8,7 @@ import { SpendingChart } from "@/components/SpendingChart";
 import { SummaryCard } from "@/components/SummaryCard";
 import { SyncStatusBar } from "@/components/SyncStatusBar";
 import { useTravelStore } from "@/hooks/useTravelStore";
+import { t } from "@/lib/strings";
 
 /**
  * Main page: sticky summary + quick add form + history.
@@ -29,7 +30,7 @@ export default function HomePage() {
   if (!hydrated || !summary) {
     return (
       <>
-        <NavBar title="Chi tiêu Trung Quốc" />
+        <NavBar title={t.appTitle} />
         <LoadingScreen />
       </>
     );
@@ -37,7 +38,7 @@ export default function HomePage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <NavBar title="Chi tiêu Trung Quốc" />
+      <NavBar title={t.appTitle} />
       <SyncStatusBar
         status={syncStatus}
         error={syncError}
@@ -57,7 +58,7 @@ export default function HomePage() {
             onClick={loadMockData}
             className="w-full rounded-xl border border-dashed border-slate-300 py-3 text-sm text-slate-500"
           >
-            Tải dữ liệu mẫu (thử nghiệm)
+            {t.loadMock}
           </button>
         )}
       </main>

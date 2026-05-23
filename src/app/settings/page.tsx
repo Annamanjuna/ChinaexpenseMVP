@@ -4,6 +4,7 @@ import { LoadingScreen } from "@/components/LoadingScreen";
 import { NavBar } from "@/components/NavBar";
 import { SettingsForm } from "@/components/SettingsForm";
 import { useTravelStore } from "@/hooks/useTravelStore";
+import { t } from "@/lib/strings";
 
 /** Settings: daily budget, exchange rate, trip dates */
 export default function SettingsPage() {
@@ -13,7 +14,7 @@ export default function SettingsPage() {
   if (!hydrated || !settings) {
     return (
       <>
-        <NavBar title="Cài đặt" backHref="/" />
+        <NavBar title={t.settings} backHref="/" />
         <LoadingScreen />
       </>
     );
@@ -21,38 +22,29 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen">
-      <NavBar title="Cài đặt" backHref="/" />
+      <NavBar title={t.settings} backHref="/" />
       <main className="mx-auto max-w-lg space-y-6 px-4 py-6">
         <SettingsForm settings={settings} onSave={updateSettings} />
 
         <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
           <h2 className="mb-2 text-sm font-semibold text-slate-700">
-            Dữ liệu cục bộ
+            {t.dataSection}
           </h2>
-          <p className="mb-3 text-xs text-slate-500">
-            Chi tiêu được lưu trên cloud (Supabase). Anna, Husband và Taya dùng
-            cùng một link sẽ thấy cùng dữ liệu.
-          </p>
+          <p className="mb-3 text-xs text-slate-500">{t.dataHint}</p>
           <button
             type="button"
             onClick={() => {
-              if (
-                confirm(
-                  "Xóa tất cả chi tiêu? Không thể hoàn tác."
-                )
-              ) {
+              if (confirm(t.clearConfirm)) {
                 clearExpenses();
               }
             }}
             className="w-full rounded-xl border border-danger-500/50 py-3 text-sm font-medium text-danger-600"
           >
-            Xóa tất cả chi tiêu
+            {t.clearAll}
           </button>
         </section>
 
-        <p className="text-center text-xs text-slate-400">
-          Bước 2: nhập từ Zalo + AI (sắp có)
-        </p>
+        <p className="text-center text-xs text-slate-400">{t.step2}</p>
       </main>
     </div>
   );

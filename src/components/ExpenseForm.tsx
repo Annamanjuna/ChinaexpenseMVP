@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { PEOPLE } from "@/lib/constants";
+import { t } from "@/lib/strings";
 import type { PersonName } from "@/types";
 
 interface ExpenseFormProps {
@@ -21,7 +22,7 @@ export function ExpenseForm({ onAdd }: ExpenseFormProps) {
 
     const parsed = parseFloat(amount.replace(",", "."));
     if (Number.isNaN(parsed) || parsed <= 0) {
-      setError("Nhập số tiền hợp lệ (CNY)");
+      setError(t.invalidAmount);
       return;
     }
 
@@ -38,13 +39,13 @@ export function ExpenseForm({ onAdd }: ExpenseFormProps) {
       className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
     >
       <h2 className="mb-3 text-sm font-semibold text-slate-700">
-        Thêm chi tiêu
+        {t.addExpense}
       </h2>
 
       <div className="space-y-3">
         <label className="block">
           <span className="mb-1 block text-xs font-medium text-slate-500">
-            Người chi
+            {t.whoPaid}
           </span>
           <select
             value={person}
@@ -61,14 +62,14 @@ export function ExpenseForm({ onAdd }: ExpenseFormProps) {
 
         <label className="block">
           <span className="mb-1 block text-xs font-medium text-slate-500">
-            Số tiền (CNY ¥)
+            {t.amountCny}
           </span>
           <input
             type="number"
             inputMode="decimal"
             step="0.01"
             min="0"
-            placeholder="VD: 120"
+            placeholder={t.amountPlaceholder}
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             className="w-full rounded-xl border border-slate-300 px-4 py-3 text-lg font-semibold tabular-nums"
@@ -77,11 +78,11 @@ export function ExpenseForm({ onAdd }: ExpenseFormProps) {
 
         <label className="block">
           <span className="mb-1 block text-xs font-medium text-slate-500">
-            Ghi chú (tuỳ chọn)
+            {t.noteOptional}
           </span>
           <input
             type="text"
-            placeholder="VD: Ăn tối, taxi..."
+            placeholder={t.notePlaceholder}
             value={note}
             onChange={(e) => setNote(e.target.value)}
             className="w-full rounded-xl border border-slate-300 px-4 py-3"
@@ -98,7 +99,7 @@ export function ExpenseForm({ onAdd }: ExpenseFormProps) {
           type="submit"
           className="w-full rounded-xl bg-brand-600 py-4 text-lg font-semibold text-white shadow-md active:bg-brand-700"
         >
-          + Thêm chi tiêu
+          {t.addExpenseButton}
         </button>
       </div>
     </form>

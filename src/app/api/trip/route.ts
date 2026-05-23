@@ -14,7 +14,7 @@ export async function GET() {
   const supabase = getSupabaseAdmin();
   if (!supabase) {
     return NextResponse.json(
-      { error: "Cloud storage not configured. Add Supabase env vars." },
+      { error: "Облако не настроено. Добавьте переменные Supabase в Vercel." },
       { status: 503 }
     );
   }
@@ -50,7 +50,7 @@ export async function PUT(request: NextRequest) {
   const supabase = getSupabaseAdmin();
   if (!supabase) {
     return NextResponse.json(
-      { error: "Cloud storage not configured." },
+      { error: "Облако не настроено." },
       { status: 503 }
     );
   }
@@ -59,7 +59,7 @@ export async function PUT(request: NextRequest) {
   if (writeSecret) {
     const header = request.headers.get("x-trip-secret");
     if (header !== writeSecret) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
     }
   }
 
@@ -67,7 +67,7 @@ export async function PUT(request: NextRequest) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    return NextResponse.json({ error: "Неверный JSON" }, { status: 400 });
   }
 
   const appData: AppData = parseAppData(body.data);
@@ -86,7 +86,10 @@ export async function PUT(request: NextRequest) {
     body.updatedAt !== existing.updated_at
   ) {
     return NextResponse.json(
-      { error: "Someone else updated the trip. Refresh to see latest." },
+      {
+        error:
+          "Кто-то уже обновил данные. Обновите страницу, чтобы увидеть актуальное.",
+      },
       { status: 409 }
     );
   }

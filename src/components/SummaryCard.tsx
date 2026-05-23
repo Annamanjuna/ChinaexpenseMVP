@@ -1,5 +1,6 @@
 import type { BudgetSummary } from "@/types";
 import { formatCny, formatVnd } from "@/lib/format";
+import { t } from "@/lib/strings";
 import { DailyProgressBar } from "@/components/DailyProgressBar";
 
 interface SummaryCardProps {
@@ -22,24 +23,24 @@ export function SummaryCard({ summary }: SummaryCardProps) {
       <div className="mx-auto max-w-lg">
         {!summary.isTripDay && (
           <p className="mb-2 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
-            Hôm nay không nằm trong khoảng ngày chuyến đi (xem Cài đặt).
+            {t.notTripDay}
           </p>
         )}
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <StatBlock
-            label="Còn lại hôm nay"
+            label={t.remainingToday}
             value={formatCny(summary.dailyRemainingCny)}
             sub={formatVnd(summary.dailyRemainingVnd)}
             highlight={summary.isOverBudget}
           />
           <StatBlock
-            label="Đã chi hôm nay"
+            label={t.spentToday}
             value={formatCny(summary.todaySpentCny)}
             sub={formatVnd(summary.todaySpentVnd)}
           />
           <StatBlock
-            label="Tổng chuyến đi"
+            label={t.tripTotal}
             value={formatCny(summary.tripSpentCny)}
             sub={formatVnd(summary.tripSpentVnd)}
           />

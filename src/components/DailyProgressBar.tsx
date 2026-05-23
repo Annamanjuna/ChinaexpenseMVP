@@ -1,5 +1,6 @@
 import type { BudgetSummary } from "@/types";
 import { formatCny } from "@/lib/format";
+import { t } from "@/lib/strings";
 
 interface DailyProgressBarProps {
   summary: BudgetSummary;
@@ -19,7 +20,7 @@ export function DailyProgressBar({ summary }: DailyProgressBarProps) {
   return (
     <div className="mt-3">
       <div className="mb-1 flex justify-between text-xs text-slate-600">
-        <span>Ngân sách hôm nay</span>
+        <span>{t.dailyBudget}</span>
         <span>
           {formatCny(spent)} / {formatCny(budget)}
         </span>
@@ -36,7 +37,7 @@ export function DailyProgressBar({ summary }: DailyProgressBarProps) {
       </div>
       {summary.isOverBudget && (
         <p className="mt-1 text-xs font-medium text-danger-600">
-          Vượt ngân sách {formatCny(Math.abs(summary.dailyRemainingCny))}
+          {t.overBudget} {formatCny(Math.abs(summary.dailyRemainingCny))}
           {overPercent > 100 && ` (${Math.round(overPercent)}%)`}
         </p>
       )}

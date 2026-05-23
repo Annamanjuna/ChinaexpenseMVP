@@ -10,6 +10,7 @@ import {
   loadAppData,
   saveAppData,
 } from "@/lib/storage";
+import { t } from "@/lib/strings";
 import { fetchTripFromCloud, saveTripToCloud } from "@/lib/trip-api";
 import type {
   AppData,
@@ -80,9 +81,7 @@ export function useTravelStore() {
           setData(local);
           setUseLocalFallback(true);
           setSyncStatus("offline");
-          setSyncError(
-            "Cloud chưa cấu hình — dùng bộ nhớ máy (chỉ thiết bị này)."
-          );
+          setSyncError(t.cloudNotConfigured);
         }
       } finally {
         if (!cancelled) setHydrated(true);
@@ -118,10 +117,14 @@ export function useTravelStore() {
         setSyncError(null);
       } catch (e) {
         const message =
-          e instanceof Error ? e.message : "Không lưu được lên cloud";
+          e instanceof Error ? e.message : t.cloudSaveFailed;
         setSyncStatus("error");
         setSyncError(message);
-        if (message.includes("409")) {
+        if (
+          message.includes("409") ||
+          message.includes("обновил") ||
+          message.includes("updated")
+        ) {
           await refreshFromCloud();
         }
       }

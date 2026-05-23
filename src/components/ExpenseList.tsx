@@ -2,6 +2,7 @@
 
 import type { Expense } from "@/types";
 import { formatCny, formatDateLabel, formatTime, formatVnd } from "@/lib/format";
+import { t } from "@/lib/strings";
 
 interface ExpenseListProps {
   expenses: Expense[];
@@ -13,7 +14,7 @@ export function ExpenseList({ expenses, onRemove }: ExpenseListProps) {
   if (expenses.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-10 text-center text-sm text-slate-500">
-        Chưa có chi tiêu nào. Thêm khoản đầu tiên ở trên.
+        {t.noExpenses}
       </div>
     );
   }
@@ -22,7 +23,7 @@ export function ExpenseList({ expenses, onRemove }: ExpenseListProps) {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-sm font-semibold text-slate-700">Lịch sử</h2>
+      <h2 className="text-sm font-semibold text-slate-700">{t.history}</h2>
       {grouped.map(({ date, items, dayTotalCny }) => (
         <div key={date}>
           <div className="mb-2 flex items-center justify-between">
@@ -74,7 +75,7 @@ export function ExpenseList({ expenses, onRemove }: ExpenseListProps) {
                     type="button"
                     onClick={() => onRemove(expense.id)}
                     className="shrink-0 rounded-lg px-2 py-1 text-xs text-slate-400 hover:bg-slate-100 hover:text-danger-600"
-                    aria-label="Xóa"
+                    aria-label={t.delete}
                   >
                     ✕
                   </button>

@@ -1,5 +1,5 @@
 -- Run this once in Supabase: SQL Editor → New query → Run
--- Shared trip data for Anna, Husband & Taya (one row for the whole group)
+-- Shared trip data for Anna, Kostya & Taya (one row for the whole group)
 
 create table if not exists public.trip_state (
   id text primary key,

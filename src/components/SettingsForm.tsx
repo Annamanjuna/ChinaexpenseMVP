@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import type { TripSettings } from "@/types";
+import { t } from "@/lib/strings";
 
 interface SettingsFormProps {
   settings: TripSettings;
@@ -32,19 +33,19 @@ export function SettingsForm({ settings, onSave }: SettingsFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <Field
-        label="Ngày bắt đầu chuyến đi"
+        label={t.settingsTripStart}
         type="date"
         value={form.tripStart}
         onChange={(v) => setForm({ ...form, tripStart: v })}
       />
       <Field
-        label="Ngày kết thúc chuyến đi"
+        label={t.settingsTripEnd}
         type="date"
         value={form.tripEnd}
         onChange={(v) => setForm({ ...form, tripEnd: v })}
       />
       <Field
-        label="Ngân sách mỗi ngày (CNY — cả 3 người)"
+        label={t.settingsDailyBudget}
         type="number"
         min="0"
         step="1"
@@ -54,7 +55,7 @@ export function SettingsForm({ settings, onSave }: SettingsFormProps) {
         }
       />
       <Field
-        label="Tỷ giá: 1 CNY = ? VND"
+        label={t.settingsRate}
         type="number"
         min="1"
         step="1"
@@ -65,20 +66,19 @@ export function SettingsForm({ settings, onSave }: SettingsFormProps) {
       />
 
       <p className="text-xs text-slate-500">
-        Mỗi ngày mới, ngân sách hàng ngày tự đặt lại. Chi tiêu được gom theo
-        ngày trên thiết bị của bạn.
+        {t.settingsHint}
       </p>
 
       <button
         type="submit"
         className="w-full rounded-xl bg-brand-600 py-4 text-lg font-semibold text-white shadow-md active:bg-brand-700"
       >
-        Lưu cài đặt
+        {t.saveSettings}
       </button>
 
       {saved && (
         <p className="text-center text-sm font-medium text-green-600">
-          Đã lưu ✓
+          {t.saved}
         </p>
       )}
     </form>

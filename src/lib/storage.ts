@@ -1,4 +1,5 @@
 import { DEFAULT_SETTINGS, STORAGE_KEY } from "@/lib/constants";
+import { t } from "@/lib/strings";
 import type { AppData, Expense, TripSettings } from "@/types";
 
 /** Empty state when nothing is saved yet */
@@ -49,16 +50,16 @@ export function getMockExpenses(rate: number): Expense[] {
       person: "Anna",
       amountCny: 45,
       amountVnd: 45 * rate,
-      note: "Bữa trưa",
+      note: t.mockLunch,
       date,
       createdAt: new Date(now.getTime() - 3600000).toISOString(),
     },
     {
       id: "mock-2",
-      person: "Husband",
+      person: "Kostya",
       amountCny: 28,
       amountVnd: 28 * rate,
-      note: "Nước uống",
+      note: t.mockDrinks,
       date,
       createdAt: new Date(now.getTime() - 7200000).toISOString(),
     },
