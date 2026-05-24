@@ -4,6 +4,7 @@ import { t } from "@/lib/strings";
 interface NavBarProps {
   title: string;
   backHref?: string;
+  /** Главная: ссылки Zalo + Настройки */
   showHomeActions?: boolean;
 }
 
@@ -28,24 +29,18 @@ export function NavBar({ title, backHref, showHomeActions }: NavBarProps) {
           </h1>
         </div>
         {showHomeActions ? (
-          <div className="flex shrink-0 items-center gap-0.5">
-            <Link
-              href="/history"
-              className="flex h-10 items-center rounded-full px-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100"
-            >
-              {t.historyShort}
-            </Link>
+          <div className="flex shrink-0 items-center gap-1">
             <Link
               href="/zalo"
-              className="flex h-10 items-center rounded-full px-2.5 text-sm font-medium text-brand-600 hover:bg-brand-50"
+              className="flex h-10 items-center rounded-full px-3 text-sm font-medium text-brand-600 hover:bg-brand-50"
             >
               Zalo
             </Link>
             <Link
               href="/settings"
-              className="flex h-10 items-center rounded-full px-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100"
+              className="flex h-10 items-center rounded-full px-3 text-sm font-medium text-slate-600 hover:bg-slate-100"
             >
-              ⚙
+              {t.settings}
             </Link>
           </div>
         ) : !backHref ? (

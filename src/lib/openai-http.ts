@@ -90,7 +90,7 @@ export async function openaiChatCompletions(
     const raw = await res.text();
     let message = `OpenAI ответил ${res.status}`;
     try {
-      const j = JSON.parse(raw) as { error?: { message?: string } };
+      const j = JSON.parse(raw) as { error?: { message?: string } } };
       if (j.error?.message) message = j.error.message;
     } catch {
       if (raw.length < 200) message = raw || message;

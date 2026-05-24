@@ -2,7 +2,6 @@ import type { BudgetSummary } from "@/types";
 import { formatCny, formatVnd } from "@/lib/format";
 import { t } from "@/lib/strings";
 import { DailyProgressBar } from "@/components/DailyProgressBar";
-import { SplitBreakdown } from "@/components/SplitBreakdown";
 
 interface SummaryCardProps {
   summary: BudgetSummary;
@@ -48,11 +47,6 @@ export function SummaryCard({ summary }: SummaryCardProps) {
         </div>
 
         <DailyProgressBar summary={summary} />
-
-        <SplitBreakdown
-          todaySplit={summary.todaySplit}
-          tripSplit={summary.tripSplit}
-        />
       </div>
     </section>
   );

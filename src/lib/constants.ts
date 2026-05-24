@@ -1,25 +1,21 @@
-import type { ExpensePayer, PersonName, TripSettings } from "@/types";
+import type { PersonName, TripSettings } from "@/types";
 
+/** The three travelers on this trip */
 export const PEOPLE: PersonName[] = ["Anna", "Kostya", "Taya"];
 
-export const PEOPLE_COUNT = 3;
-
-/** Значение в базе для общих расходов */
-export const SHARED_PAYER: ExpensePayer = "Shared";
-
-/** Подпись в интерфейсе */
-export const SHARED_LABEL = "Общее";
-
-/** Варианты в форме добавления */
-export const EXPENSE_PAYERS: { value: ExpensePayer; label: string }[] = [
-  ...PEOPLE.map((p) => ({ value: p as ExpensePayer, label: p })),
-  { value: SHARED_PAYER, label: SHARED_LABEL },
-];
-
+/** localStorage key — fallback when cloud is unavailable (dev/offline) */
 export const STORAGE_KEY = "travel-expense-china-2026";
+
+/** Supabase row id for this trip */
 export const TRIP_STATE_ID = "china-2026";
+
+/** How often to pull updates from the cloud (ms) */
 export const SYNC_POLL_MS = 8000;
 
+/**
+ * Default trip settings for the China trip (May 25–31).
+ * Users can change these on the Settings page.
+ */
 export const DEFAULT_SETTINGS: TripSettings = {
   tripStart: "2026-05-25",
   tripEnd: "2026-05-31",

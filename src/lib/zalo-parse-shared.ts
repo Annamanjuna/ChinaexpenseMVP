@@ -1,5 +1,5 @@
-import { PEOPLE, SHARED_PAYER } from "@/lib/constants";
-import type { ExpensePayer, PersonName } from "@/types";
+import { PEOPLE } from "@/lib/constants";
+import type { PersonName } from "@/types";
 import type { ParsedZaloExpense } from "@/types/zalo";
 import { isValidParsedList } from "@/lib/zalo-parse-regex";
 
@@ -7,7 +7,7 @@ export const ZALO_AI_SYSTEM = `You extract travel expenses for a China trip from
 - Zalo chat messages
 - Photos of receipts (Chinese 收据/发票/小票), payment screenshots, QR pay confirmations
 
-People: ${PEOPLE.join(", ")}. Use "Shared" (or Общее) when the expense is split between all ${PEOPLE.length} people.
+People (exact names only): ${PEOPLE.join(", ")}.
 Default currency: CNY (Chinese Yuan) for everything in China.
 
 IMPORTANT — receipts:
@@ -19,7 +19,7 @@ IMPORTANT — receipts:
 Do NOT use amounts clearly in VND (đ, VND, ₫, донг) or USD ($) unless converted to CNY.
 
 Return JSON only:
-{ "expenses": [ { "person": "Anna"|"Kostya"|"Taya"|"Shared", "amountCny": number, "note": "optional" } ] }`;
+{ "expenses": [ { "person": "Anna"|"Kostya"|"Taya", "amountCny": number, "note": "optional" } ] }`;
 
 export function parseExpensesFromAiJson(
   content: string
@@ -39,14 +39,7 @@ export function normalizeAiItem(e: {
 }): ParsedZaloExpense | null {
   let person = e.person;
   if (person === "Husband") person = "Kostya";
-  if (
-    person === "Shared" ||
-    person === "Общее" ||
-    person === "общее"
-  ) {
-    person = SHARED_PAYER;
-  }
-  if (!person || (!PEOPLE.includes(person as PersonName) && person !== SHARED_PAYER)) {
+  if (!person || !PEOPLE.includes(person as PersonName)) {
     person = "Anna";
   }
   const amountCny =
@@ -55,7 +48,7 @@ export function normalizeAiItem(e: {
       : Number(e.amountCny);
   if (!amountCny || amountCny <= 0 || Number.isNaN(amountCny)) return null;
   return {
-    person: person as ExpensePayer,
+    person: person as PersonName,
     amountCny: Math.round(amountCny * 100) / 100,
     note: e.note?.trim() || undefined,
   };

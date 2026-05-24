@@ -17,7 +17,7 @@ import type {
   AppData,
   BudgetSummary,
   Expense,
-  ExpensePayer,
+  PersonName,
   TripSettings,
 } from "@/types";
 
@@ -168,13 +168,13 @@ export function useTravelStore() {
   }, []);
 
   const buildExpense = useCallback(
-    (payer: ExpensePayer, amountCny: number, note?: string): Expense | null => {
+    (person: PersonName, amountCny: number, note?: string): Expense | null => {
       if (!data || amountCny <= 0) return null;
       const rate = data.settings?.cnyToVndRate ?? DEFAULT_SETTINGS.cnyToVndRate;
       const today = getTodayDateString();
       return {
         id: crypto.randomUUID(),
-        person: payer,
+        person,
         amountCny,
         amountVnd: cnyToVnd(amountCny, rate),
         note: note?.trim() || undefined,
@@ -186,8 +186,8 @@ export function useTravelStore() {
   );
 
   const addExpense = useCallback(
-    (payer: ExpensePayer, amountCny: number, note?: string) => {
-      const expense = buildExpense(payer, amountCny, note);
+    (person: PersonName, amountCny: number, note?: string) => {
+      const expense = buildExpense(person, amountCny, note);
       if (!expense) return false;
       setData((prev) => {
         if (!prev) return prev;
@@ -200,7 +200,7 @@ export function useTravelStore() {
 
   /** Импорт нескольких расходов из Zalo */
   const addExpenses = useCallback(
-    (items: { person: ExpensePayer; amountCny: number; note?: string }[]) => {
+    (items: { person: PersonName; amountCny: number; note?: string }[]) => {
       const newOnes: Expense[] = [];
       for (const item of items) {
         const e = buildExpense(item.person, item.amountCny, item.note);

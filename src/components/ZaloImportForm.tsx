@@ -3,14 +3,14 @@
 import { useRef, useState, type ReactNode } from "react";
 import { ZaloExpensePreview } from "@/components/ZaloExpensePreview";
 import { t } from "@/lib/strings";
-import type { ExpensePayer } from "@/types";
+import type { PersonName } from "@/types";
 import type { ParsedZaloExpense, ZaloParseResponse } from "@/types/zalo";
 
 type Tab = "text" | "screenshot";
 
 interface ZaloImportFormProps {
   onAddBatch: (
-    items: { person: ExpensePayer; amountCny: number; note?: string }[]
+    items: { person: PersonName; amountCny: number; note?: string }[]
   ) => number;
 }
 

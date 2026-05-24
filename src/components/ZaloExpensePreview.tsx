@@ -2,7 +2,6 @@
 
 import { formatCny } from "@/lib/format";
 import { t } from "@/lib/strings";
-import { payerLabel } from "@/lib/person-stats";
 import type { ParsedZaloExpense } from "@/types/zalo";
 
 interface ZaloExpensePreviewProps {
@@ -35,7 +34,7 @@ export function ZaloExpensePreview({
               />
               <div>
                 <p className="font-semibold text-slate-900">
-                      {payerLabel(item.person)} — {formatCny(item.amountCny)}
+                  {item.person} — {formatCny(item.amountCny)}
                 </p>
                 {item.note && (
                   <p className="text-sm text-slate-500">{item.note}</p>

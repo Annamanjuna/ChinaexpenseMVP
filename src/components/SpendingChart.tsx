@@ -1,22 +1,32 @@
 "use client";
 
 import type { Expense } from "@/types";
+import { PEOPLE } from "@/lib/constants";
 import { formatCny, getTodayDateString } from "@/lib/format";
-import { computeSplitSummary } from "@/lib/person-stats";
 import { t } from "@/lib/strings";
 
 interface SpendingChartProps {
   expenses: Expense[];
-  rate: number;
 }
 
-export function SpendingChart({ expenses, rate }: SpendingChartProps) {
+/**
+ * Simple horizontal bar chart: today's spending per person.
+ * Lightweight — pure CSS, no chart library.
+ */
+export function SpendingChart({ expenses }: SpendingChartProps) {
+  const safe = expenses ?? [];
   const today = getTodayDateString();
-  const todayExpenses = (expenses ?? []).filter((e) => e.date === today);
-  const split = computeSplitSummary(todayExpenses, rate);
+  const todayExpenses = safe.filter((e) => e.date === today);
 
-  const max = Math.max(...split.perPerson.map((p) => p.cny), 1);
-  const hasAny = split.perPerson.some((p) => p.cny > 0);
+  const totals = PEOPLE.map((person) => ({
+    person,
+    amount: todayExpenses
+      .filter((e) => e.person === person)
+      .reduce((s, e) => s + e.amountCny, 0),
+  }));
+
+  const max = Math.max(...totals.map((t) => t.amount), 1);
+  const hasAny = totals.some((t) => t.amount > 0);
 
   if (!hasAny) return null;
 
@@ -26,18 +36,18 @@ export function SpendingChart({ expenses, rate }: SpendingChartProps) {
         {t.spendingByPerson}
       </h2>
       <ul className="space-y-3">
-        {split.perPerson.map(({ person, cny }) => (
+        {totals.map(({ person, amount }) => (
           <li key={person}>
             <div className="mb-1 flex justify-between text-xs">
               <span className="font-medium text-slate-700">{person}</span>
               <span className="tabular-nums text-slate-600">
-                {formatCny(cny)}
+                {formatCny(amount)}
               </span>
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-slate-100">
               <div
                 className="h-full rounded-full bg-brand-500 transition-all"
-                style={{ width: `${(cny / max) * 100}%` }}
+                style={{ width: `${(amount / max) * 100}%` }}
               />
             </div>
           </li>
